@@ -1,0 +1,19 @@
+@theme {
+  --color-primary: #58CC02;
+  --color-primary-shadow: #58A700;
+  --color-secondary: #1CB0F6;
+  --color-secondary-shadow: #1899D6;
+  --color-danger: #FF4B4B;
+  --color-danger-shadow: #EA1515;
+  --color-warning: #FFC800;
+  --color-warning-shadow: #F49000;
+  --color-neutral-100: #F7F7F7;
+  --color-neutral-200: #E5E5E5;
+  --color-neutral-300: #AFAFAF;
+  --color-neutral-400: #777777;
+  --color-neutral-500: #4B4B4B;
+
+  --font-sans: 'Nunito_400Regular', system-ui, sans-serif;
+  --font-bold: 'Nunito_700Bold', system-ui, sans-serif;
+  --font-black: 'Nunito_900Black', system-ui, sans-serif;
+}
