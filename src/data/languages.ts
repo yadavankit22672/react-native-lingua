@@ -25,14 +25,14 @@ export const LANGUAGES: Language[] = [
     flag: "https://flagcdn.com/w320/jp.png",
     learners: "12.7M",
   },
-  {
-    id: "lang_ko",
-    name: "Korean",
-    nativeName: "한국어",
-    code: "ko",
-    flag: "https://flagcdn.com/w320/kr.png",
-    learners: "9.3M",
-  },
+  // {
+  //   id: "lang_ko",
+  //   name: "Korean",
+  //   nativeName: "한국어",
+  //   code: "ko",
+  //   flag: "https://flagcdn.com/w320/kr.png",
+  //   learners: "9.3M",
+  // },
   {
     id: "lang_de",
     name: "German",
@@ -41,12 +41,12 @@ export const LANGUAGES: Language[] = [
     flag: "https://flagcdn.com/w320/de.png",
     learners: "8.1M",
   },
-  {
-    id: "lang_zh",
-    name: "Chinese",
-    nativeName: "中文",
-    code: "zh",
-    flag: "https://flagcdn.com/w320/cn.png",
-    learners: "7.4M",
-  },
+  // {
+  //   id: "lang_zh",
+  //   name: "Chinese",
+  //   nativeName: "中文",
+  //   code: "zh",
+  //   flag: "https://flagcdn.com/w320/cn.png",
+  //   learners: "7.4M",
+  // },
 ];

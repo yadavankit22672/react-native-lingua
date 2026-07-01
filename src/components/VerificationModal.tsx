@@ -52,7 +52,8 @@ export function VerificationModal({ visible, onClose, onVerify }: VerificationMo
             </Text>
 
             <TextInput
-              style={styles.input}
+              className="bg-neutral-100 border-2 border-neutral-200 rounded-2xl p-4 text-2xl text-black font-bold text-center"
+              style={{ letterSpacing: 8 }}
               value={code}
               onChangeText={handleCodeChange}
               keyboardType="number-pad"
@@ -74,17 +75,4 @@ export function VerificationModal({ visible, onClose, onVerify }: VerificationMo
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: colors.neutral[100],
-    borderWidth: 2,
-    borderColor: colors.neutral[200],
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    letterSpacing: 8,
-    color: colors.black,
-  }
-});
+

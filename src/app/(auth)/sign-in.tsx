@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -108,7 +108,7 @@ export default function SignInScreen() {
 
           <Text className="text-lg font-bold text-neutral-500 mb-2 ml-1">Email</Text>
           <TextInput
-            style={styles.input}
+            className="bg-neutral-100 border-2 border-neutral-200 rounded-2xl p-4 text-lg text-black font-medium"
             placeholder="Email"
             placeholderTextColor={colors.neutral[300]}
             value={email}
@@ -121,7 +121,8 @@ export default function SignInScreen() {
           <Text className="text-lg font-bold text-neutral-500 mb-2 ml-1 mt-4">Password</Text>
           <View className="justify-center">
             <TextInput
-              style={[styles.input, { paddingRight: 50 }]}
+              className="bg-neutral-100 border-2 border-neutral-200 rounded-2xl p-4 text-lg text-black font-medium"
+              style={{ paddingRight: 50 }}
               placeholder="Password"
               placeholderTextColor={colors.neutral[300]}
               value={password}
@@ -224,15 +225,4 @@ function SocialButton({ type, title, onPress }: { type: 'apple' | 'google' | 'fa
   return null;
 }
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: colors.neutral[100],
-    borderWidth: 2,
-    borderColor: colors.neutral[200],
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 18,
-    color: colors.black,
-    fontWeight: '500',
-  }
-});
+
