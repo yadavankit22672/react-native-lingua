@@ -1,9 +1,23 @@
-import { Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import { Text, View, ActivityIndicator } from "react-native";
+import { Redirect } from "expo-router";
 import { PrimaryButton } from "@/components/PrimaryButton";
+import { useAuth, useClerk } from "@clerk/expo";
 
 export default function Index() {
-  const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
+  const { signOut } = useClerk();
+
+  if (!isLoaded) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Redirect href="/onboarding" />;
+  }
 
   return (
     <View className="flex-1 items-center justify-center bg-white p-8 gap-8">
@@ -11,8 +25,8 @@ export default function Index() {
         Duo Lingo Clone
       </Text>
       <PrimaryButton 
-        title="Open Onboarding" 
-        onPress={() => router.push('/onboarding')} 
+        title="Sign Out" 
+        onPress={() => signOut()} 
       />
     </View>
   );

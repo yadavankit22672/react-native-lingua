@@ -8,16 +8,71 @@ import { VerificationModal } from '@/components/VerificationModal';
 import { colors } from '@/theme/colors';
 import { images } from '@/constants/images';
 
-export default function SignInScreen() {
+import { useSignUp, useSSO } from '@clerk/expo';
+
+export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const router = useRouter();
 
-  const handleSignIn = () => {
-    if (email.trim() && password.trim()) {
+  const { signUp } = useSignUp();
+  const { startSSOFlow } = useSSO();
+
+  const handleSocialAuth = async (strategy: 'oauth_facebook' | 'oauth_google' | 'oauth_apple') => {
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace('/');
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('Error', err.message || 'An error occurred during social authentication.');
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!email.trim() || !password.trim()) return;
+    
+    try {
+      const { error } = await signUp.password({
+        emailAddress: email,
+        password,
+      });
+
+      if (error) {
+        console.error(JSON.stringify(error, null, 2));
+        Alert.alert('Error', error.message || 'An error occurred during sign up.');
+        return;
+      }
+
+      await signUp.verifications.sendEmailCode();
       setShowVerification(true);
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('Error', err.message || 'An error occurred during sign up.');
+    }
+  };
+
+  const handleVerify = async (code: string) => {
+    try {
+      await signUp.verifications.verifyEmailCode({
+        code,
+      });
+      if (signUp.status === 'complete') {
+        await signUp.finalize({
+          navigate: ({ session, decorateUrl }) => {
+            router.replace('/');
+          },
+        });
+      } else {
+        console.error('Sign-up attempt not complete:', signUp);
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('Error', err.message || 'Invalid verification code.');
     }
   };
 
@@ -25,7 +80,7 @@ export default function SignInScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['bottom']}>
       <Stack.Screen 
         options={{
-          headerTitle: 'Sign in to your account',
+          headerTitle: 'Create your account',
           headerTitleAlign: 'center',
           headerShadowVisible: false,
           headerStyle: { backgroundColor: colors.white },
@@ -60,7 +115,7 @@ export default function SignInScreen() {
               resizeMode="contain" 
             />
             <Text className="text-xl font-bold text-neutral-500 flex-1 leading-snug">
-              Welcome back to your journey
+              Start your language journey today
             </Text>
           </View>
 
@@ -103,8 +158,8 @@ export default function SignInScreen() {
 
           <View className="mt-8">
             <PrimaryButton 
-              title="SIGN IN" 
-              onPress={handleSignIn} 
+              title="CREATE ACCOUNT" 
+              onPress={handleSignUp} 
             />
           </View>
 
@@ -115,14 +170,14 @@ export default function SignInScreen() {
           </View>
 
           <View className="gap-4">
-            <SocialButton type="facebook" title="FACEBOOK" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
-            <SocialButton type="google" title="GOOGLE" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
-            <SocialButton type="apple" title="APPLE" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
+            <SocialButton type="facebook" title="FACEBOOK" onPress={() => handleSocialAuth('oauth_facebook')} />
+            <SocialButton type="google" title="GOOGLE" onPress={() => handleSocialAuth('oauth_google')} />
+            <SocialButton type="apple" title="APPLE" onPress={() => handleSocialAuth('oauth_apple')} />
           </View>
 
           <View className="mt-10 px-4">
             <Text className="text-center text-neutral-400 text-sm leading-relaxed">
-              By signing in to Muolingo, you agree to our{' '}
+              By signing up for Muolingo, you agree to our{' '}
               <Text className="font-bold">Terms</Text> and{' '}
               <Text className="font-bold">Privacy Policy</Text>.
             </Text>
@@ -134,6 +189,7 @@ export default function SignInScreen() {
       <VerificationModal 
         visible={showVerification} 
         onClose={() => setShowVerification(false)} 
+        onVerify={handleVerify}
       />
     </SafeAreaView>
   );

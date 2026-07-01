@@ -6,9 +6,10 @@ import { colors } from '@/theme/colors';
 interface VerificationModalProps {
   visible: boolean;
   onClose: () => void;
+  onVerify?: (code: string) => void;
 }
 
-export function VerificationModal({ visible, onClose }: VerificationModalProps) {
+export function VerificationModal({ visible, onClose, onVerify }: VerificationModalProps) {
   const [code, setCode] = useState('');
   const router = useRouter();
 
@@ -19,11 +20,15 @@ export function VerificationModal({ visible, onClose }: VerificationModalProps) 
     
     // Auto navigate when 6 digits are entered
     if (formatted.length === 6) {
-      setTimeout(() => {
-        setCode('');
-        onClose();
-        router.replace('/');
-      }, 300);
+      if (onVerify) {
+        onVerify(formatted);
+      } else {
+        setTimeout(() => {
+          setCode('');
+          onClose();
+          router.replace('/');
+        }, 300);
+      }
     }
   };
 
@@ -43,7 +48,7 @@ export function VerificationModal({ visible, onClose }: VerificationModalProps) 
             </View>
             
             <Text className="text-neutral-500 text-lg mb-6">
-              We've sent a 6-digit verification code to your email.
+              We&apos;ve sent a 6-digit verification code to your email.
             </Text>
 
             <TextInput
@@ -59,7 +64,7 @@ export function VerificationModal({ visible, onClose }: VerificationModalProps) 
 
             <View className="mt-8">
               <Text className="text-center text-neutral-400">
-                Didn't receive the code? <Text className="text-primary font-bold">Resend</Text>
+                Didn&apos;t receive the code? <Text className="text-primary font-bold">Resend</Text>
               </Text>
             </View>
           </View>

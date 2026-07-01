@@ -8,16 +8,58 @@ import { VerificationModal } from '@/components/VerificationModal';
 import { colors } from '@/theme/colors';
 import { images } from '@/constants/images';
 
-export default function SignUpScreen() {
+import { useSignIn, useSSO } from '@clerk/expo';
+
+export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
   const router = useRouter();
 
-  const handleSignUp = () => {
-    if (email.trim() && password.trim()) {
-      setShowVerification(true);
+  const { signIn } = useSignIn();
+  const { startSSOFlow } = useSSO();
+
+  const handleSocialAuth = async (strategy: 'oauth_facebook' | 'oauth_google' | 'oauth_apple') => {
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace('/');
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('Error', err.message || 'An error occurred during social authentication.');
+    }
+  };
+
+  const handleSignIn = async () => {
+    if (!email.trim() || !password.trim()) return;
+    
+    try {
+      const { error } = await signIn.password({
+        emailAddress: email,
+        password,
+      });
+
+      if (error) {
+        console.error(JSON.stringify(error, null, 2));
+        Alert.alert('Error', error.message || 'Invalid email or password.');
+        return;
+      }
+
+      if (signIn.status === 'complete') {
+        await signIn.finalize({
+          navigate: ({ session, decorateUrl }) => {
+            router.replace('/');
+          }
+        });
+      } else {
+        console.error('Sign-in attempt not complete:', signIn);
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('Error', err.message || 'Invalid email or password.');
     }
   };
 
@@ -25,7 +67,7 @@ export default function SignUpScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['bottom']}>
       <Stack.Screen 
         options={{
-          headerTitle: 'Create your account',
+          headerTitle: 'Sign in to your account',
           headerTitleAlign: 'center',
           headerShadowVisible: false,
           headerStyle: { backgroundColor: colors.white },
@@ -60,7 +102,7 @@ export default function SignUpScreen() {
               resizeMode="contain" 
             />
             <Text className="text-xl font-bold text-neutral-500 flex-1 leading-snug">
-              Start your language journey today
+              Welcome back to your journey
             </Text>
           </View>
 
@@ -103,8 +145,8 @@ export default function SignUpScreen() {
 
           <View className="mt-8">
             <PrimaryButton 
-              title="CREATE ACCOUNT" 
-              onPress={handleSignUp} 
+              title="SIGN IN" 
+              onPress={handleSignIn} 
             />
           </View>
 
@@ -115,14 +157,14 @@ export default function SignUpScreen() {
           </View>
 
           <View className="gap-4">
-            <SocialButton type="facebook" title="FACEBOOK" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
-            <SocialButton type="google" title="GOOGLE" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
-            <SocialButton type="apple" title="APPLE" onPress={() => Alert.alert('Coming Soon', 'Social authentication will be implemented soon.')} />
+            <SocialButton type="facebook" title="FACEBOOK" onPress={() => handleSocialAuth('oauth_facebook')} />
+            <SocialButton type="google" title="GOOGLE" onPress={() => handleSocialAuth('oauth_google')} />
+            <SocialButton type="apple" title="APPLE" onPress={() => handleSocialAuth('oauth_apple')} />
           </View>
 
           <View className="mt-10 px-4">
             <Text className="text-center text-neutral-400 text-sm leading-relaxed">
-              By signing up for Muolingo, you agree to our{' '}
+              By signing in to Muolingo, you agree to our{' '}
               <Text className="font-bold">Terms</Text> and{' '}
               <Text className="font-bold">Privacy Policy</Text>.
             </Text>
