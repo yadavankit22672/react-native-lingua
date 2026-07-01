@@ -1,5 +1,5 @@
 import { Text, View, ActivityIndicator } from "react-native";
-import { Redirect } from "expo-router";
+import { Redirect, Link } from "expo-router";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useAuth, useClerk } from "@clerk/expo";
 
@@ -28,6 +28,9 @@ export default function Index() {
         title="Sign Out" 
         onPress={() => signOut()} 
       />
+      <Link href="/choose-language" asChild>
+        <PrimaryButton title="Choose Language" />
+      </Link>
     </View>
   );
 }
