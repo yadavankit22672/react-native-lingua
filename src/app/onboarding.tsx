@@ -1,12 +1,28 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, Redirect } from 'expo-router';
+import { useAuth } from '@clerk/expo';
 import { images } from '@/constants/images';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { colors } from '@/theme/colors';
 
 export default function OnboardingScreen() {
+  const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (isSignedIn) {
+    return <Redirect href="/" />;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }} edges={['bottom']}>
       <Stack.Screen 
@@ -46,15 +62,11 @@ export default function OnboardingScreen() {
       <View className="px-4 pb-8 pt-4 gap-4 w-full">
         <PrimaryButton 
           title="GET STARTED" 
-          onPress={() => {
-            // Add action later
-          }} 
+          onPress={() => router.push('/sign-up')} 
         />
         <SecondaryButton 
           title="I ALREADY HAVE AN ACCOUNT" 
-          onPress={() => {
-            // Add action later
-          }} 
+          onPress={() => router.push('/sign-in')} 
         />
       </View>
     </SafeAreaView>
