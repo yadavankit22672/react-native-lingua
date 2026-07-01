@@ -6,11 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { LANGUAGES } from '@/data/languages';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { images } from '@/constants/images';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 export default function ChooseLanguageScreen() {
   const router = useRouter();
+  const { selectedLanguageId: storedLanguageId, setLanguage } = useLanguageStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLanguageId, setSelectedLanguageId] = useState<string | null>('lang_es');
+  const [selectedLanguageId, setSelectedLanguageId] = useState<string | null>(storedLanguageId || 'lang_es');
 
   const filteredLanguages = LANGUAGES.filter((lang) =>
     lang.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -94,7 +96,8 @@ export default function ChooseLanguageScreen() {
                 title="CONTINUE" 
                 onPress={() => {
                   if (selectedLanguageId) {
-                    router.back();
+                    setLanguage(selectedLanguageId);
+                    router.replace('/');
                   }
                 }}
                 style={{ opacity: selectedLanguageId ? 1 : 0.5 }}

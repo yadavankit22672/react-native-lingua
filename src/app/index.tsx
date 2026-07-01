@@ -1,13 +1,15 @@
-import { Text, View, ActivityIndicator } from "react-native";
-import { Redirect, Link } from "expo-router";
-import { PrimaryButton } from "@/components/PrimaryButton";
-import { useAuth, useClerk } from "@clerk/expo";
+import { View, ActivityIndicator } from "react-native";
+import { Redirect } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { LANGUAGES } from "@/data/languages";
 
 export default function Index() {
   const { isSignedIn, isLoaded } = useAuth();
-  const { signOut } = useClerk();
+  
+  const { selectedLanguageId, hasHydrated, clearLanguage } = useLanguageStore();
 
-  if (!isLoaded) {
+  if (!isLoaded || !hasHydrated) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" />
@@ -19,18 +21,18 @@ export default function Index() {
     return <Redirect href="/onboarding" />;
   }
 
-  return (
-    <View className="flex-1 items-center justify-center bg-white p-8 gap-8">
-      <Text className="text-4xl text-center text-primary font-bold">
-        Duo Lingo Clone
-      </Text>
-      <PrimaryButton 
-        title="Sign Out" 
-        onPress={() => signOut()} 
-      />
-      <Link href="/choose-language" asChild>
-        <PrimaryButton title="Choose Language" />
-      </Link>
-    </View>
-  );
+  if (!selectedLanguageId) {
+    return <Redirect href="/choose-language" />;
+  }
+
+  const selectedLanguage = LANGUAGES.find(lang => lang.id === selectedLanguageId);
+
+  if (!selectedLanguage) {
+    // Stored ID is invalid (e.g. data changed), clear and redirect
+    setTimeout(() => clearLanguage(), 0);
+    return <Redirect href="/choose-language" />;
+  }
+
+  // Successfully authenticated and selected language, go to tabs
+  return <Redirect href="/(tabs)" />;
 }
